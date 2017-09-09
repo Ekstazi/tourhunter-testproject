@@ -2,30 +2,17 @@
 
 namespace app\models;
 
-class User extends \yii\base\Object implements \yii\web\IdentityInterface
-{
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
+use yii\db\ActiveRecord;
+use yii\db\Exception;
 
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
+/**
+ * This is the model class for table "{{%users}}".
+ * @property int $id
+ * @property string $login
+ * @property float $balance
+ */
+class User extends ActiveRecord implements \yii\web\IdentityInterface
+{
 
 
     /**
@@ -33,7 +20,7 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public static function findIdentity($id)
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return static::findOne($id);
     }
 
     /**
@@ -41,13 +28,7 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return static::findByUsername($token);
     }
 
     /**
@@ -58,13 +39,30 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public static function findByUsername($username)
     {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
+        return static::findOne(['login' => strtolower($username)]);
+    }
+
+    public static function tableName()
+    {
+        return '{{%users}}';
+    }
+
+    /**
+     * @param $username
+     * @return static
+     * @throws Exception
+     */
+    public static function findOrCreate($username)
+    {
+        if ($user = static::findByUsername($username)) {
+            return $user;
         }
 
-        return null;
+        $user = new static(['login' => strtolower($username)]);
+        if (!$user->save()) {
+            throw new Exception('Cannot create user');
+        }
+        return $user;
     }
 
     /**
@@ -80,7 +78,7 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
      */
     public function getAuthKey()
     {
-        return $this->authKey;
+        return $this->login;
     }
 
     /**
@@ -91,14 +89,28 @@ class User extends \yii\base\Object implements \yii\web\IdentityInterface
         return $this->authKey === $authKey;
     }
 
-    /**
-     * Validates password
-     *
-     * @param string $password password to validate
-     * @return bool if password provided is valid for current user
-     */
-    public function validatePassword($password)
+    public function attributeLabels()
     {
-        return $this->password === $password;
+        return [
+            'id'      => \Yii::t('user', 'Id'),
+            'login'   => \Yii::t('user', 'Login'),
+            'balance' => \Yii::t('user', 'Balance'),
+        ];
     }
+
+    public function getBalanceHistory()
+    {
+        return $this->hasMany(BalanceHistory::className(), ['user_id' => 'id']);
+    }
+
+    public function rules()
+    {
+        return [
+            ['login', 'required'],
+            ['login', 'match', 'pattern' => '~^[\w]+$~'],
+            ['balance', 'number'],
+        ];
+    }
+
+
 }
