@@ -58,7 +58,10 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
             return $user;
         }
 
-        $user = new static(['login' => strtolower($username)]);
+        $user = new static([
+            'login' => strtolower($username),
+            'balance' => 0,
+        ]);
         if (!$user->save()) {
             throw new Exception('Cannot create user');
         }

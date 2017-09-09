@@ -1,52 +1,52 @@
 <?php
-
 namespace tests\models;
 
 use app\models\LoginForm;
+use app\tests\fixtures\UserFixture;
 use Codeception\Specify;
+use yii\codeception\DbTestCase;
 
-class LoginFormTest extends \Codeception\Test\Unit
+class LoginFormTest extends DbTestCase
 {
-    private $model;
-
-    protected function _after()
+    public function fixtures()
     {
-        \Yii::$app->user->logout();
+        return [
+            'users' => UserFixture::className(),
+        ];
     }
+
+
+    private $model;
 
     public function testLoginNoUser()
     {
         $this->model = new LoginForm([
             'username' => 'not_existing_username',
-            'password' => 'not_existing_password',
         ]);
-
-        expect_not($this->model->login());
-        expect_that(\Yii::$app->user->isGuest);
+        expect_that($this->model->login());
+        expect_not(\Yii::$app->user->isGuest);
     }
 
-    public function testLoginWrongPassword()
+    public function testLoginWrongLogin()
     {
         $this->model = new LoginForm([
-            'username' => 'demo',
-            'password' => 'wrong_password',
+            'username' => '___!',
         ]);
 
         expect_not($this->model->login());
         expect_that(\Yii::$app->user->isGuest);
-        expect($this->model->errors)->hasKey('password');
+        expect($this->model->errors)->hasKey('username');
     }
 
     public function testLoginCorrect()
     {
         $this->model = new LoginForm([
             'username' => 'demo',
-            'password' => 'demo',
         ]);
 
         expect_that($this->model->login());
         expect_not(\Yii::$app->user->isGuest);
-        expect($this->model->errors)->hasntKey('password');
+        expect($this->model->errors)->hasntKey('username');
     }
 
 }

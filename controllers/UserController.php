@@ -44,10 +44,6 @@ class UserController extends Controller
      */
     public function actionLogin()
     {
-        if (!\Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
         $model = new LoginForm();
         if ($model->load(\Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
@@ -104,13 +100,21 @@ class UserController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only'  => ['logout'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
-                        'allow'   => true,
+                        'allow'   => false,
                         'roles'   => ['@'],
+                        'actions' => ['login'],
                     ],
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'allow'   => true,
+                        'roles'   => ['?'],
+                        'actions' => ['index', 'login'],
+                    ]
                 ],
             ],
             'verbs'  => [
