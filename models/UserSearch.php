@@ -5,8 +5,15 @@ namespace app\models;
 
 use yii\data\ActiveDataProvider;
 
+/**
+ * Class UserSearch
+ * @package app\models
+ */
 class UserSearch extends User
 {
+    /**
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -15,6 +22,10 @@ class UserSearch extends User
         ];
     }
 
+    /**
+     * @param array $params
+     * @return ActiveDataProvider
+     */
     public function search($params = [])
     {
         $query = static::find();

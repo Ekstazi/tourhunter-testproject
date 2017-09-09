@@ -42,6 +42,9 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         return static::findOne(['login' => strtolower($username)]);
     }
 
+    /**
+     * @return string
+     */
     public static function tableName()
     {
         return '{{%users}}';
@@ -92,6 +95,9 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         return $this->authKey === $authKey;
     }
 
+    /**
+     * @return array
+     */
     public function attributeLabels()
     {
         return [
@@ -101,11 +107,17 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
         ];
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getBalanceHistory()
     {
         return $this->hasMany(BalanceHistory::className(), ['user_id' => 'id']);
     }
 
+    /**
+     * @return array
+     */
     public function rules()
     {
         return [

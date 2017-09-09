@@ -5,6 +5,10 @@ namespace app\models;
 
 use yii\data\ActiveDataProvider;
 
+/**
+ * Class BalanceHistorySearch
+ * @package app\models
+ */
 class BalanceHistorySearch extends BalanceHistory
 {
     public function rules()
@@ -15,7 +19,10 @@ class BalanceHistorySearch extends BalanceHistory
         ];
     }
 
-
+    /**
+     * @param array $params
+     * @return ActiveDataProvider
+     */
     public function search($params = [])
     {
         $query = static::find();
