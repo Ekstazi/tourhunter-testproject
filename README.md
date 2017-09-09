@@ -4,3 +4,4 @@ How to run:
 
 How to test
 ./vendor/bin/codecept run
+Time to develope ~7 hours
