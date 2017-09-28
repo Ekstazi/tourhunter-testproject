@@ -27,8 +27,9 @@ class TransferForm extends Model
     {
         return [
             [['user', 'amount'], 'required'],
-            ['amount', 'number', 'min' => 0],
+            ['amount', 'number', 'min' => 1],
             ['user', 'match', 'pattern' => '~^[\w]+$~'],
+            ['user', 'compare', 'compareValue' => \Yii::$app->user->identity->login, 'operator' => '!=']
         ];
     }
 

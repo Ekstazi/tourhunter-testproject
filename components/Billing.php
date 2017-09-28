@@ -31,6 +31,10 @@ class Billing extends Component
         $user_from_model = User::findOrCreate($user_from);
         $user_to_model = User::findOrCreate($user_to);
 
+        if($user_from_model->equals($user_to_model)) {
+            throw new Exception('Cannot transfer to yourself');
+        }
+
         // we use mutex because we have invariant with amount_before in history
         if (!$this->mutex->acquire('billing', 30)) {
             throw new Exception('Cannot process operation');

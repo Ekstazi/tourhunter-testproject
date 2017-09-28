@@ -43,7 +43,7 @@ $config = [
             ],
         ],
         'formatter'    => [
-            'currencyCode' => '$',
+            'locale' => 'en_US'
         ],
         'db'           => $db,
         'urlManager' => [
